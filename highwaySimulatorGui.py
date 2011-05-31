@@ -101,10 +101,10 @@ class HighwaySimulatorGui(QMainWindow):
     def startSimu(self):
         self.startTime = datetime.now()
         self.simulations = []
-        self.nextPrate = 0
+        #self.nextPrate = 0
         self.gapPrate  = 10
-        self.sameSimuTimes = 40 # Do X times the same simulation (with the same settings)
-        self.nextSimu   = 0
+        self.sameSimuTimes = 30 # Do X times the same simulation (with the same settings)
+        #self.nextSimu   = 0
         self.blockUi()
         self.simulationsDone = 0
         #output = self.pathOption.getValue() + dateToFilename(d) + '_results.txt'
@@ -144,6 +144,8 @@ class HighwaySimulatorGui(QMainWindow):
     @Slot(str)
     def wafDone(self, outputPath):
         #print 'thread done!\nReceived:'
+        self.simulationsDone += 1
+        simulationsLeft = self.simulationsTotal-self.simulationsDone
         with open(outputPath,'r') as out:
             r = json.loads(out.read())
             out.close()
@@ -151,12 +153,11 @@ class HighwaySimulatorGui(QMainWindow):
                 result = "%3.3d\t%f" % (int(r['settings']['prate']),float(r['results']['timeToReachDest']))
             else:
                 result = 'ERROR: No timeToReachDest (%s)' % outputPath
-            self.startButton.setText(result)
+            self.startButton.setText('%d simulations left...' % simulationsLeft)
             print '%s | %s' % (datetime.now(), result)
             with open(self.resultFile, 'a') as summary:
                 summary.write('%s | %s\n' % (datetime.now(), result))
                 summary.close()
-        self.simulationsDone += 1
         self.progressBar.setValue(self.simulationsDone)
         if self.simulationsDone==self.simulationsTotal:
             self.releaseUi()
@@ -165,9 +166,12 @@ class HighwaySimulatorGui(QMainWindow):
                 os.system('sudo halt')
         else:
             # calculate estimated time left
-            percentage_done = 1.0*self.simulationsDone/self.simulationsTotal
-            done_in = (datetime.now()-self.startTime).seconds
-            timeLeft = done_in*((1/percentage_done)-1)
+#            percentage_done = 1.0*self.simulationsDone/self.simulationsTotal
+#            done_in = (datetime.now()-self.startTime).seconds
+#            timeLeft = done_in*((1.0/percentage_done)-1.0)
+            # v2: average time per simulation * nb of simulations left
+            averageTimePerSimulation = (datetime.now()-self.startTime).seconds/self.simulationsDone
+            timeLeft = averageTimePerSimulation * simulationsLeft
             #print "%f perc done in %d seconds => %d seconds left" % (percentage_done, done_in, timeLeft)
             formatedTimeLeft = self.formatTimeLeft(timeLeft)
             self.infoLabel.setText("Estimated time left: %s" % formatedTimeLeft)

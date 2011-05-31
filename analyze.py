@@ -22,7 +22,7 @@ if os.path.exists(resultsPath):
                         pass
                     else:
                         if 'results' in r and 'timeToReachDest' in r['results']:
-                            if r['settings']['dis']==0:
+                            if r['settings']['dis']==2:
                                 results.append(r)
                     result.close()
 
@@ -38,6 +38,7 @@ for r in results:
     #print 'from %s: [%3.3f,%3.3f]' % (r['filename'], r['settings']['prate'],r['results']['timeToReachDest'])
 if nb<=0:
     print 'No simulation found for the criteria'
+    from sys import exit
     exit()
 
 print 'Average Simulation Time: %d (among %d simulations)' % (int(int(totalTime)/int(nb)),nb)
@@ -53,17 +54,18 @@ with open(os.path.join(resultsPath,'test.dat'),'w') as data:
             totalSimulationTime  += float(result['simulationTime'])
             totalTimeToReachDest += float(result['results']['timeToReachDest'])
             nb += 1
-        meanSimulationTime  = float(1.0*totalSimulationTime/nb)
-        meanTimeToReachDest = float(1.0*totalTimeToReachDest/nb)
-        meanValues[p] = {'prate':p,
-                         'simuLationTime':meanSimulationTime,
-                         'simulationsNb':nb,
-                         'timeToReachDest':meanTimeToReachDest}
-        print meanValues[p]
-        toPlot = '%s %s' % (p, meanValues[p]['timeToReachDest'])
-        #print toPlot
-        data.write(toPlot+'\n')
-        p += 10
+        if nb>0:
+            meanSimulationTime  = float(1.0*totalSimulationTime/nb)
+            meanTimeToReachDest = float(1.0*totalTimeToReachDest/nb)
+            meanValues[p] = {'prate':p,
+                             'simuLationTime':meanSimulationTime,
+                             'simulationsNb':nb,
+                             'timeToReachDest':meanTimeToReachDest}
+            print meanValues[p]
+            toPlot = '%s %s' % (p, meanValues[p]['timeToReachDest'])
+            #print toPlot
+            data.write(toPlot+'\n')
+        p += 1
     data.close()
 
 os.system(os.path.join(resultsPath,'toPlot.sh'))
