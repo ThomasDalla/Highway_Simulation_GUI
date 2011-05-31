@@ -85,7 +85,8 @@ class HighwaySimulatorGui(QMainWindow):
         centralLayout.addWidget(self.infoLabel)
         self.setWindowTitle('Nishimura Lab | Highway Simulation')
         self.resize(520,len(self.options)*60+100)
-        self.resultFile = open('/home/thomas/Dropbox/Keio/research/results/summary.txt', 'a')
+        #self.resultFile = open('/home/thomas/Dropbox/Keio/research/results/summary.txt', 'a')
+        self.resultFile = '/home/thomas/Dropbox/Keio/research/results/summary.txt'
     def blockUi(self):
         self.startButton.setEnabled(False)
         for option in self.options:
@@ -152,7 +153,9 @@ class HighwaySimulatorGui(QMainWindow):
                 result = 'ERROR: No timeToReachDest (%s)' % outputPath
             self.startButton.setText(result)
             print '%s | %s' % (datetime.now(), result)
-            self.resultFile.write('%s | %s\n' % (datetime.now(), result))
+            with open(self.resultFile, 'a') as summary:
+                summary.write('%s | %s\n' % (datetime.now(), result))
+                summary.close()
         self.simulationsDone += 1
         self.progressBar.setValue(self.simulationsDone)
         if self.simulationsDone==self.simulationsTotal:
@@ -179,7 +182,6 @@ class HighwaySimulatorGui(QMainWindow):
             c = 0
         QSettings().setValue('shutdown',c)
     def closeEvent(self, *args, **kwargs):
-        self.resultFile.close()
         self.saveSettings()
         try:
             for waf in self.simulations:
