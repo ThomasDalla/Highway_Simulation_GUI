@@ -197,8 +197,9 @@ class HighwayAnalyzeWidget(QWidget):
             QMessageBox.critical(self, 'Error!', 'No simulation satisfies the criteria...')
     def log(self, txt):
         toLog = str(txt)
+        toLogFile = '%s | %s' % (datetime.now(), txt)
         with open(self.logFile, 'a') as logFile:
-            logFile.write(toLog+'\n')
+            logFile.write(toLogFile+'\n')
         self.logText.append(toLog)
     def saveSettings(self):
         QSettings().setValue('simuNbMin', self.filterNb.getValue())
