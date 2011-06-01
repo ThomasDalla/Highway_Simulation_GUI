@@ -195,8 +195,7 @@ class HighwayAnalyzeWidget(QWidget):
             #os.system(os.path.join(self.resultsPath(),'toPlot.sh'))
         else:
             QMessageBox.critical(self, 'Error!', 'No simulation satisfies the criteria...')
-    def log(self, txt):
-        toLog = '%s | %s' % (datetime.now(), txt)
+    def log(self, toLog):
         with open(self.logFile, 'a') as logFile:
             logFile.write(toLog+'\n')
         self.logText.append(toLog)
