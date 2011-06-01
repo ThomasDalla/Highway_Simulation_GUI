@@ -1,14 +1,18 @@
 __author__ = 'thomas'
 
-from PySide.QtGui import QWidget, QHBoxLayout, QLabel, QLineEdit, QDoubleSpinBox, QSpinBox, QComboBox
+from PySide.QtGui import QWidget, QHBoxLayout, QLabel, QLineEdit, QDoubleSpinBox, QSpinBox, QComboBox, QCheckBox
 from PySide.QtCore import QSettings, Qt
 from datetime import datetime
 import random
 
 class SimpleOption(QWidget):
-    def __init__(self, settingsName, labelText, defaultValue):
+    def __init__(self, settingsName, labelText, defaultValue, checkable=False):
         super(SimpleOption, self).__init__()
         self.setLayout(QHBoxLayout())
+        self.checkable = checkable
+        if checkable:
+            self.checkBox = QCheckBox()
+            self.layout().addWidget(self.checkBox)
         self.label = QLabel(labelText)
         self.label.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.label.setMinimumWidth(240)
@@ -37,9 +41,9 @@ class SimpleOption(QWidget):
         return str(self.getValue())
 
 class SimpleSpinOption(SimpleOption):
-    def __init__(self, settingsName, labelText, defaultValue, integer=False):
+    def __init__(self, settingsName, labelText, defaultValue, integer=False, checkable=False):
         self.integer = integer
-        super(SimpleSpinOption,self).__init__(settingsName, labelText, defaultValue)
+        super(SimpleSpinOption,self).__init__(settingsName, labelText, defaultValue, checkable)
     def editor(self, defaultValue):
         if self.integer:
             self.spinBox = QSpinBox()
@@ -60,10 +64,12 @@ class SimpleSpinOption(SimpleOption):
         self.spinBox.setRange(min, max)
 
 class SimpleComboboxOption(SimpleOption):
-    def __init__(self, settingsName, labelText, defaultValue, *options):
-        super(SimpleComboboxOption,self).__init__(settingsName, labelText, defaultValue)
+    def __init__(self, settingsName, labelText, defaultValue, checkable=False, *options):
+        self.options = options
+        super(SimpleComboboxOption,self).__init__(settingsName, labelText, defaultValue, checkable)
     def editor(self, defaultValue):
-        options = ('Uniform','Exponential','Normal','Log Normal')
+        #options = ('Uniform','Exponential','Normal','Log Normal')
+        options = self.options
         self.combo = QComboBox()
         self.combo.addItems(options)
         self.combo.setCurrentIndex(int(QSettings().value(self.settingsName, defaultValue)))
