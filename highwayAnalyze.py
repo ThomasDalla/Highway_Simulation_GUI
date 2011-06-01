@@ -158,7 +158,9 @@ class HighwayAnalyzeWidget(QWidget):
         self.logText.clear()
         p=0
         meanValues = {}
-        with open(os.path.join(self.resultsPath(),'test.dat'),'w') as data:
+        uniqueName = dateToFilename()
+        gnuPlotDataFile =os.path.join(self.resultsPath(),'graphs/' + uniqueName+'.dat')
+        with open(gnuPlotDataFile,'w') as data:
             while p<=100:
                 nb = 0
                 totalTimeToReachDest = 0
@@ -185,8 +187,8 @@ class HighwayAnalyzeWidget(QWidget):
                 p += 1
             data.close()
         if len(meanValues)>0:
-            outputPic = 'graphs/' + dateToFilename()
-            s = subprocess.Popen(['./toPlot.sh', outputPic, self.resultsPath()], cwd=self.resultsPath())
+            outputPic = 'graphs/' + uniqueName
+            s = subprocess.Popen(['./toPlot.sh', outputPic, gnuPlotDataFile], cwd=self.resultsPath())
             s.wait()
             outputPicPath = os.path.join(self.resultsPath(),outputPic+'.svg')
             pic = QImage(outputPicPath)
