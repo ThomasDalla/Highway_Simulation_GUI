@@ -5,6 +5,22 @@ from PySide.QtCore import QSettings, Qt
 from datetime import datetime
 import random
 
+def formatTimeLeft(self, timeLeft):
+    if timeLeft>60*60*24:
+        timeLeft = timeLeft/60.0/60.0/24.0
+        unit = 'day'
+    elif timeLeft>60*60:
+        timeLeft = timeLeft/60.0/60.0
+        unit = 'hour'
+    elif timeLeft>60:
+        timeLeft /= 60.0
+        unit = 'minute'
+    else:
+        unit = 'second'
+    if timeLeft>1:
+        unit += 's'
+    return "%2.2f %s" % (timeLeft, unit)
+
 class SimpleOption(QWidget):
     def __init__(self, settingsName, labelText, defaultValue, checkable=False):
         super(SimpleOption, self).__init__()

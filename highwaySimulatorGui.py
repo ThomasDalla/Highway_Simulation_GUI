@@ -1,7 +1,7 @@
 __author__ = 'thomas'
 
-from PySide.QtGui import QMainWindow, QTabWidget, QVBoxLayout, QGroupBox, QPushButton, QProgressBar, QMessageBox, QGridLayout, QTextBrowser, QFont
-from PySide.QtCore import Slot, QThreadPool, QThread
+from PySide.QtGui import QMainWindow, QTabWidget, QVBoxLayout, QGroupBox, QPushButton, QProgressBar, QMessageBox, QGridLayout, QTextBrowser, QFont, QPixmap, QImage
+from PySide.QtCore import Slot, QThreadPool, QThread, QSize
 from helpers import *
 from wafThread import *
 import tempfile
@@ -153,22 +153,7 @@ class HighwaySimulatorGui(QMainWindow):
         self.progressBar.setRange(0,self.simulationsTotal)
         # 300 seconds per task average
         roughTime = self.simulationsTotal*self.resultsWidget.averageSimulationTime/QThreadPool.globalInstance().maxThreadCount()
-        self.infoLabel.setText('Rough time estimation: %s' % self.formatTimeLeft(roughTime))
-    def formatTimeLeft(self, timeLeft):
-        if timeLeft>60*60*24:
-            timeLeft = timeLeft/60.0/60.0/24.0
-            unit = 'day'
-        elif timeLeft>60*60:
-            timeLeft = timeLeft/60.0/60.0
-            unit = 'hour'
-        elif timeLeft>60:
-            timeLeft /= 60.0
-            unit = 'minute'
-        else:
-            unit = 'second'
-        if timeLeft>1:
-            unit += 's'
-        return "%2.2f %s" % (timeLeft, unit)
+        self.infoLabel.setText('Rough time estimation: %s' % formatTimeLeft(roughTime))
     @Slot(str)
     def wafDone(self, outputPath):
         #print 'thread done!\nReceived:'
@@ -203,7 +188,7 @@ class HighwaySimulatorGui(QMainWindow):
             averageTimePerSimulation = (datetime.now()-self.startTime).seconds/self.simulationsDone
             timeLeft = averageTimePerSimulation * simulationsLeft
             #print "%f perc done in %d seconds => %d seconds left" % (percentage_done, done_in, timeLeft)
-            formatedTimeLeft = self.formatTimeLeft(timeLeft)
+            formatedTimeLeft = formatTimeLeft(timeLeft)
             self.infoLabel.setText("Estimated time left: %s" % formatedTimeLeft)
     def saveSettings(self):
         for setting in self.options:
@@ -228,21 +213,31 @@ class HighwayAnalyzeWidget(QWidget):
         super(HighwayAnalyzeWidget,self).__init__()
         self.averageSimulationTime = 290.0
         mainLayout = QVBoxLayout()
-        mainLayout.setAlignment(Qt.AlignTop)
+        mainLayout.setAlignment(Qt.AlignTop|Qt.AlignHCenter)
         self.setLayout(mainLayout)
+        gridWidget = QWidget()
+        self.gridLayout = QGridLayout()
+        gridWidget.setLayout(self.gridLayout)
         self.setupTopGroup()
         self.setupFilterGroup()
+        self.layout().addWidget(gridWidget)
         # Analyze the results BUTTON
         self.analyzeResultsButton = QPushButton('Analyze the results')
         self.analyzeResultsButton.clicked.connect(self.analyzeResults)
         self.analyzeResultsButton.setEnabled(False)
-        self.layout().addWidget(self.analyzeResultsButton)
+        self.gridLayout.addWidget(self.analyzeResultsButton,0,1)
         # LOG
         self.logText = QTextBrowser()
         self.logText.setFont(QFont('Century Gothic', 7))
-        self.layout().addWidget(self.logText)
+        self.gridLayout.addWidget(self.logText,1,1)
         self.results = []
         self.logFile = os.path.join(self.resultsPath(), 'analyze_'+os.uname()[1]+'.log')
+        # Image
+        self.picLabel = QLabel()
+        self.picLabel.setAlignment(Qt.AlignHCenter)
+        #self.picLabel.resize(800,600)
+        self.picLabel.setMinimumSize(800,600)
+        self.layout().addWidget(self.picLabel)
     def setupTopGroup(self):
         topGroup = QGroupBox("Simulation Results")
         self.resultsPathLineEdit = SimpleOption('resultsPath','Results Path','/home/thomas/Dropbox/Keio/research/results/')
@@ -256,7 +251,7 @@ class HighwayAnalyzeWidget(QWidget):
         self.loadResultsButton.clicked.connect(self.loadResults)
         topGroupLayout.addWidget(self.loadResultsButton)
         topGroup.setLayout(topGroupLayout)
-        self.layout().addWidget(topGroup)
+        self.gridLayout.addWidget(topGroup,0,0)
     def resultsPath(self):
         return self.resultsPathLineEdit.getValue()
     def setupFilterGroup(self):
@@ -271,7 +266,7 @@ class HighwayAnalyzeWidget(QWidget):
         self.filterNb.checkBox.setChecked(True)
         filterGroupLayout.addWidget(self.filterNb)
         filterGroup.setLayout(filterGroupLayout)
-        self.layout().addWidget(filterGroup)
+        self.gridLayout.addWidget(filterGroup,1,0)
     def loadResults(self):
         self.loadResultsButton.setText('Loading the results...')
         self.loadResultsButton.setEnabled(False)
@@ -347,7 +342,13 @@ class HighwayAnalyzeWidget(QWidget):
                     data.write(toPlot+'\n')
                 p += 1
             data.close()
-        subprocess.Popen(['./toPlot.sh'], cwd=self.resultsPath())
+        outputPic = 'graphs/' + dateToFilename()
+        s = subprocess.Popen(['./toPlot.sh', outputPic, self.resultsPath()], cwd=self.resultsPath())
+        s.wait()
+        outputPicPath = os.path.join(self.resultsPath(),outputPic+'.svg')
+        pic = QImage(outputPicPath)
+        #pic = pic.scaled(QSize(640,480))
+        self.picLabel.setPixmap(QPixmap(pic))
         #os.system(os.path.join(self.resultsPath(),'toPlot.sh'))
     def log(self, txt):
         toLog = '%s | %s' % (datetime.now(), txt)
