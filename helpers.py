@@ -5,7 +5,7 @@ from PySide.QtCore import QSettings, Qt
 from datetime import datetime
 import random
 
-def formatTimeLeft(self, timeLeft):
+def formatTimeLeft(timeLeft):
     if timeLeft>60*60*24:
         timeLeft = timeLeft/60.0/60.0/24.0
         unit = 'day'
@@ -25,13 +25,14 @@ class SimpleOption(QWidget):
     def __init__(self, settingsName, labelText, defaultValue, checkable=False):
         super(SimpleOption, self).__init__()
         self.setLayout(QHBoxLayout())
+        #self.layout().setSpacing(0)
         self.checkable = checkable
         if checkable:
             self.checkBox = QCheckBox()
             self.layout().addWidget(self.checkBox)
         self.label = QLabel(labelText)
         self.label.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-        self.label.setMinimumWidth(240)
+        #self.label.setMinimumWidth(240)
         self.layout().addWidget(self.label)
         self.settingsName = settingsName
         self.editor(defaultValue)
