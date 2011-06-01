@@ -95,7 +95,7 @@ class HighwaySimulatorGui(QMainWindow):
         centralLayout.addWidget(self.progressBar)
         self.shutdownWhenDone = QCheckBox('Shutdown when done')
         self.actionWhenDone = QComboBox()
-        self.actionWhenDone.addItems(['When finished... Do nothing', 'When finished... Shutdown', 'When finished... Restart the simulations'])
+        self.actionWhenDone.addItems(['When finished... do nothing', 'When finished... shutdown the computer', 'When finished... Re-run the simulations!'])
         self.actionWhenDone.setCurrentIndex(int(QSettings().value('actionWhenDone', 0)))
         centralLayout.addWidget(self.actionWhenDone)
         self.infoLabel = QLabel()
