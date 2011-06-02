@@ -5,7 +5,9 @@ import subprocess, threading
 import os, json, random
 from datetime import datetime
 
-def dateToFilename(d=datetime.now(),rn=random.randint(1,10000)):
+def dateToFilename(d=datetime.now(),rn=-1):
+    if rn==-1:
+        rn=random.randint(1,10000)
     return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%.7d'%rn
     #return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%d'%d.microsecond
 
