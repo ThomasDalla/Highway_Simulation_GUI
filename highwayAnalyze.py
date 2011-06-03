@@ -120,13 +120,15 @@ class HighwayAnalyzeWidget(QWidget):
     @Slot(dict)
     def loadResultsDone(self, results):
         self.results = results
-        msg= 'Found %d Simulation Results' % len(self.results)
+        resultsNb = len(self.results)
+        msg= 'Found %d Simulation Results\n(%d invalid files, %d simulations failed)' % (resultsNb, self.resultsThread.fileUnloadable, self.resultsThread.simulationFailed)
         self.loadResultsLabel.setText(msg)
-        self.calculateAverageSimulationTime()
+        #self.calculateAverageSimulationTime()
         self.loadResultsButton.setText('Reload the results')
         self.loadResultsButton.setEnabled(True)
         self.analyzeResultsButton.setEnabled(True)
-        self.analyzeResults()
+        if resultsNb>0:
+            self.analyzeResults()
     def calculateAverageSimulationTime(self):
         totalTime = 0
         nb = 0
@@ -219,9 +221,14 @@ class LoadResults(QThread):
     error = Signal(str)
     def __init__(self, resultsPath):
         super(LoadResults,self).__init__()
-        self.resultsPath = resultsPath
+        self.resultsPath      = resultsPath
+        self.fileUnloadable   = 0
+        self.simulationFailed = 0
+        self.results = []
     def run(self):
         results = []
+        self.fileUnloadable   = 0
+        self.simulationFailed = 0
         if os.path.exists(self.resultsPath):
             tempdir = tempfile.mkdtemp(prefix='results_tmpdir',dir=self.resultsPath)
             # temporary extract the tar.gz files in this folder
@@ -238,18 +245,21 @@ class LoadResults(QThread):
                             r = json.loads(result.read())
                         except:
                             #print 'errra with file %s' % name
-                            pass
+                            self.fileUnloadable += 1
                         else:
-                            r['filename'] = name
-                            r['date'] = datetime.fromtimestamp(os.path.getmtime(filePath))
                             #print r['date']
-                            if 'results' in r and 'timeToReachDest' in r['results']:
+                            if 'results' in r and 'timeToReachDest' in r['results'] and 'succeed' in r and r['succeed'] == 1:
+                                r['filename'] = name
+                                r['date'] = datetime.fromtimestamp(os.path.getmtime(filePath))
                                 results.append(r)
+                            else:
+                                self.simulationFailed += 1
                         result.close()
             # remove the temporary folder
             for filename in os.listdir(tempdir):
                 os.remove(os.path.join(tempdir,filename))
             os.rmdir(tempdir)
+            self.results = results
             self.done.emit(results)
         else:
             errorMsg = 'The directory containing the results (%s) does not exist' % self.resultsPath
