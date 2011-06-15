@@ -78,6 +78,7 @@ if os.path.exists(outputFolder):
                         #previousVelMS = currentVelMS
                     previousTime = currentTime
                     previousPos  = currentPos
+            ambuResult.close()
             print currentData
             print currentAccData
             g = Gnuplot.Gnuplot()
@@ -85,8 +86,6 @@ if os.path.exists(outputFolder):
             v = currentData['vel']
             a = currentAccData['acc']
             d1 = Gnuplot.Data(x,v,title='velocity (km/h)',smooth='csplines with lines')
-            #d1 = Gnuplot.Data(x,v,title='velocity (km/h)')
-            #d2 = Gnuplot.Data(currentAccData['time'],a,title='acceleration (m/s2)',smooth='csplines with lines')
             d2 = Gnuplot.Data(currentAccData['time'],a,title='acceleration (m/s2)',smooth='freq with boxes')
             # 'smooth csplines  with lines'
             g.xlabel('Time (s)')

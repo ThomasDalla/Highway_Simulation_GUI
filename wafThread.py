@@ -91,6 +91,10 @@ class WafThread(QRunnable, QObject):
                 jsonR = json.loads(jsonResult)
                 self.output['results'] = jsonR
                 self.output['succeed'] = 1
+            except ValueError:
+                self.output['results'] = result
+                self.output['succeed'] = "Error decoding Json Result"
+            else:
                 # Plot Ambu speed/accel
                 with open(self.outputAmbu) as ambuResult:
                     currentData = {'time':[],'pos':[],'vel':[],'velms':[]}
@@ -143,15 +147,12 @@ class WafThread(QRunnable, QObject):
                 # 'smooth csplines  with lines'
                 g.xlabel('Time (sec.)')
                 #g.ylabel('Velocity (km/h)')
-                g.title('[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'],jsonR['averageGapOnLane0']))
+                g.title('[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'].getValue(),self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New']))
                 g.plot(d1)
-                g.hardcopy(basename+'_vel.svg',terminal='svg',enhanced=1,size='1024 768')
+                g.hardcopy(filename=basename+'_vel.svg',terminal='svg',enhanced=1,size='1024 768')
                 #g.ylabel('Acceleration (m/s2)')
                 g.plot(d2)
                 g.hardcopy(basename+'_acc.svg',terminal='svg',enhanced=1,size='1024 768')
-            except:
-                self.output['results'] = result
-                self.output['succeed'] = "Error decoding Json Result"
         else:
             self.output['results'] = result
             self.output['succeed'] = 0
