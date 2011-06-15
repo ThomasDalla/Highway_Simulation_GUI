@@ -147,7 +147,11 @@ class WafThread(QRunnable, QObject):
                 # 'smooth csplines  with lines'
                 g.xlabel('Time (sec.)')
                 #g.ylabel('Velocity (km/h)')
-                g.title('[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New']))
+                try:
+                    t = '[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New'])
+                except:
+                    t = basename
+                g.title(t)
                 g.plot(d1)
                 g.hardcopy(filename=basename+'_vel.svg',terminal='svg',enhanced=1,size='1024 768')
                 #g.ylabel('Acceleration (m/s2)')
