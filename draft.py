@@ -46,7 +46,7 @@ if os.path.exists(outputFolder):
                 previousPos     = -1
                 previousTime    = -1
                 previousVel     = -1
-                previousVelMS   = -1
+                #previousVelMS   = -1
                 previousVelSum  = -1
                 previousTimeSum = -1
                 currentVelSum   = 0
@@ -75,7 +75,7 @@ if os.path.exists(outputFolder):
                                 previousTimeSum = currentTime
                                 currentVelSum = 0
                         previousVel = currentVel
-                        previousVelMS = currentVelMS
+                        #previousVelMS = currentVelMS
                     previousTime = currentTime
                     previousPos  = currentPos
             print currentData

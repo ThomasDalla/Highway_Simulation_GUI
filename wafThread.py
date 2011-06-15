@@ -84,7 +84,7 @@ class WafThread(QRunnable, QObject):
         out.close()
         self.output['returnCode'] = returnCode
         self.output['simulationTime'] = (datetime.now()-self.startTime).seconds
-        if returnCode==0:
+        if returnCode==0 or returnCode==-15:
             #print result
             jsonResult = '{\n'+result+'"end":"True"\n}'
             try:
@@ -100,7 +100,7 @@ class WafThread(QRunnable, QObject):
                     previousPos     = -1
                     previousTime    = -1
                     previousVel     = -1
-                    previousVelMS   = -1
+                    #previousVelMS   = -1
                     previousVelSum  = -1
                     previousTimeSum = -1
                     currentVelSum   = 0
@@ -129,7 +129,7 @@ class WafThread(QRunnable, QObject):
                                     previousTimeSum = currentTime
                                     currentVelSum = 0
                             previousVel = currentVel
-                            previousVelMS = currentVelMS
+                            #previousVelMS = currentVelMS
                         previousTime = currentTime
                         previousPos  = currentPos
                 ambuResult.close()

@@ -169,7 +169,12 @@ class HighwaySimulatorGui(QMainWindow):
             r = json.loads(out.read())
             out.close()
             if 'timeToReachDest' in r['results']:
-                result = "%3.3d\t%f" % (int(r['settings']['prate']),float(r['results']['timeToReachDest']))
+                try:
+                    result = "%3.3d\t%f" % (int(r['settings']['prate']),float(r['results']['timeToReachDest']))
+                except TypeError, e:
+                    result = 'PYTHON ERROR: %s | File: %s' % (e, outputPath)
+                    print result
+                    print r
             else:
                 result = 'ERROR: No timeToReachDest (%s)' % outputPath
             self.startButton.setText('%d simulations left...' % simulationsLeft)
