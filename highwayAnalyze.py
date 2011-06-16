@@ -11,7 +11,7 @@ from PySide.QtCore import Slot, QThread, Qt
 class HighwayAnalyzeWidget(QWidget):
     def __init__(self):
         super(HighwayAnalyzeWidget,self).__init__()
-        self.averageSimulationTime = 290.0
+        self.averageSimulationTime = 1100.0
         mainLayout = QVBoxLayout()
         mainLayout.setAlignment(Qt.AlignTop|Qt.AlignHCenter)
         mainLayout.setSpacing(0)

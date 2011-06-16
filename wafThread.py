@@ -6,12 +6,15 @@ import os, json, random
 from datetime import datetime
 import Gnuplot
 
-def dateToFilename(d=-1,rn=-1):
+def dateToFilename(d=-1,rn=-1,prate=-1):
+    prateStr = ''
+    if prate>=0:
+        prateStr = '_pr%.3d' % prate
     if rn==-1:
         rn=random.randint(1,10000)
     if d==-1:
         d= datetime.now()
-    return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%.7d'%rn
+    return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%.7d'%rn+prateStr
     #return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%d'%d.microsecond
 
 class Ns2Command(object):
@@ -48,6 +51,8 @@ class WafThread(QRunnable, QObject):
         QObject.__init__(self)
         self.options = ''
         self.optionsDict = options
+        self.prate = options['prate']
+        #print self.optionsDict
         for option in options:
             if option=='vel1' or option=='spl':
                 speedInMs = options[option].getValue()*1000/3600
@@ -69,7 +74,7 @@ class WafThread(QRunnable, QObject):
                 settings[option] = options[option].getValue()
         self.output = {'settings':settings,'command':'%s %s%s' % (self.command, ' --run \'', self.scenario+self.options+'\'')}
     def run(self, *args, **kwargs):
-        outputBase = os.path.join(self.outputFolder,dateToFilename(datetime.now(), self.runNumber))
+        outputBase = os.path.join(self.outputFolder,dateToFilename(datetime.now(), self.runNumber, prate=self.prate))
         self.outputFile = outputBase+'.txt'
         self.outputAmbu = outputBase+'_ambu.txt'
         basename, ext = os.path.splitext(self.outputFile)
@@ -157,8 +162,22 @@ class WafThread(QRunnable, QObject):
                     # 'smooth csplines  with lines'
                     g.xlabel('Time (sec.)')
                     #g.ylabel('Velocity (km/h)')
+                    # update basename
+                    minGapStr = maxGapStr = gapStr = ''
+                    if 'minGapLane0' in jsonR:
+                        minGapStr = '_gMin%.3d' % jsonR['minGapLane0']
+                    if 'maxGapLane0' in jsonR:
+                        maxGapStr = '_gMax%.4d' % jsonR['maxGapLane0']
+                    if 'averageGapOnLane0' in jsonR:
+                        gapStr = '_g%.4d' % jsonR['averageGapOnLane0_New']
+                    basename += minGapStr+gapStr+maxGapStr
                     try:
-                        t = '[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New'])
+                        t = '[prate:%d][dis:%d][gap:%2.2f][flow:%2.2f][maxFlow:%2.2f]'\
+                        % (self.prate,
+                           self.optionsDict['dis'].getValue(),
+                           self.optionsDict['gap'].getValue(),
+                           self.optionsDict['flow1'].getValue(),
+                           self.optionsDict['maxflow'].getValue())
                     except:
                         t = basename
                     g.title(t)
