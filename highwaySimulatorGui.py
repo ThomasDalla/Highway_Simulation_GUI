@@ -54,11 +54,11 @@ class HighwaySimulatorGui(QMainWindow):
         self.options['vel1'].setRange(5,150)
         self.options['dis'] = SimpleComboboxOption('dis','Speed Distribution Model',3, False, 'Uniform','Exponential','Normal','Log Normal')
         self.options['spstd'] = SimpleSpinOption('spstd','Speed Distribution Variance',1.0)
-        self.options['spstd'].setRange(0,10)
+        self.options['spstd'].setRange(0,50)
         self.options['flow1'] = SimpleSpinOption('flow1','Traffic Flow Mean (veh/s)',1.0)
         self.options['flow1'].setRange(0.1,50.0)
         self.options['std1'] = SimpleSpinOption('std1','Traffic Flow Variance',0.8)
-        self.options['std1'].setRange(0.1,5.0)
+        self.options['std1'].setRange(0.1,50.0)
         self.options['maxflow'] = SimpleSpinOption('maxflow','Traffic Maximum Flow (veh/s)',5)
         self.options['maxflow'].setRange(0.1,50.0)
         for widget in ('vel1','dis','spstd','flow1','std1','maxflow'):
