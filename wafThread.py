@@ -95,8 +95,18 @@ class WafThread(QRunnable, QObject):
                 self.output['results'] = result
                 self.output['succeed'] = "Error decoding Json Result"
             else:
-                # Plot Ambu speed/accel
-                with open(self.outputAmbu) as ambuResult:
+                hasRead = False
+                tries=0
+                while (not hasRead) and (tries<10):
+                    tries += 1
+                    try: # Try to read the ambu file
+                        ambuResult = open(self.outputAmbu)
+                    except IOError: # If there is an error, sleep
+                        from time import sleep
+                        sleep(5)
+                    else: # else go to the next step!
+                        hasRead =  True
+                if hasRead:
                     currentData = {'time':[],'pos':[],'vel':[],'velms':[]}
                     currentAccData = {'time':[],'acc':[]}
                     k   = 0
@@ -136,27 +146,29 @@ class WafThread(QRunnable, QObject):
                             #previousVelMS = currentVelMS
                         previousTime = currentTime
                         previousPos  = currentPos
-                ambuResult.close()
-                # Gnuplot
-                g = Gnuplot.Gnuplot()
-                x = currentData['time']
-                v = currentData['vel']
-                a = currentAccData['acc']
-                d1 = Gnuplot.Data(x,v,title='velocity (km/h)',smooth='csplines with lines')
-                d2 = Gnuplot.Data(currentAccData['time'],a,title='acceleration (m/s2)',smooth='freq with boxes')
-                # 'smooth csplines  with lines'
-                g.xlabel('Time (sec.)')
-                #g.ylabel('Velocity (km/h)')
-                try:
-                    t = '[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New'])
-                except:
-                    t = basename
-                g.title(t)
-                g.plot(d1)
-                g.hardcopy(filename=basename+'_vel.svg',terminal='svg',enhanced=1,size='1024 768')
-                #g.ylabel('Acceleration (m/s2)')
-                g.plot(d2)
-                g.hardcopy(basename+'_acc.svg',terminal='svg',enhanced=1,size='1024 768')
+                    ambuResult.close()
+                    # Gnuplot
+                    g = Gnuplot.Gnuplot()
+                    x = currentData['time']
+                    v = currentData['vel']
+                    a = currentAccData['acc']
+                    d1 = Gnuplot.Data(x,v,title='velocity (km/h)',smooth='csplines with lines')
+                    d2 = Gnuplot.Data(currentAccData['time'],a,title='acceleration (m/s2)',smooth='freq with boxes')
+                    # 'smooth csplines  with lines'
+                    g.xlabel('Time (sec.)')
+                    #g.ylabel('Velocity (km/h)')
+                    try:
+                        t = '[prate:%d][rn:%d][flow:%2.2f][gap:%d]' % (self.optionsDict['prate'],self.runNumber,self.optionsDict['flow1'].getValue(),jsonR['averageGapOnLane0_New'])
+                    except:
+                        t = basename
+                    g.title(t)
+                    g.plot(d1)
+                    g.hardcopy(filename=basename+'_vel.svg',terminal='svg',enhanced=1,size='1024 768')
+                    #g.ylabel('Acceleration (m/s2)')
+                    g.plot(d2)
+                    g.hardcopy(basename+'_acc.svg',terminal='svg',enhanced=1,size='1024 768')
+                else:
+                    self.output['results']['ambuDebug'] = 'Impossible to read %s' % self.outputAmbu
         else:
             self.output['results'] = result
             self.output['succeed'] = 0
