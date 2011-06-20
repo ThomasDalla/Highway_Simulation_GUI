@@ -80,7 +80,7 @@ class WafThread(QRunnable, QObject):
         basename, ext = os.path.splitext(self.outputFile)
         self.options += ' --ambu=1 --af=%s' % self.outputAmbu
         out = open(self.outputFile, 'w')
-        command = Ns2Command(self.options, out)
+        command = Ns2Command(self.options, out, scenario=self.scenario)
         self.startTime = datetime.now()
         returnCode = command.run()
         out.close()

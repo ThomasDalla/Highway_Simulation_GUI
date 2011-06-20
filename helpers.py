@@ -97,3 +97,5 @@ class SimpleComboboxOption(SimpleOption):
         self.combo.setEnabled(e)
     def getValue(self):
         return self.combo.currentIndex()
+    def getName(self):
+        return self.combo.currentText()

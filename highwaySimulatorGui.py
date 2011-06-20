@@ -32,6 +32,8 @@ class HighwaySimulatorGui(QMainWindow):
         generalGroup.layout().setSpacing(0)
         self.pathOption = SimpleOption('path','Output Path','/home/thomas/Dropbox/Keio/research/results/')
         generalGroup.layout().addWidget(self.pathOption)
+        self.scenarioOption = SimpleComboboxOption('scenario','Scenario',1, False, 'vanet-highway-test-thomas','vanet-highway-scenario2')
+        generalGroup.layout().addWidget(self.scenarioOption)
         self.options['time'] = SimpleSpinOption('time','Simulation Time (sec.)',1500,True)
         self.options['time'].setRange(0,3000)
         self.options['mix'] = SimpleSpinOption('mix','Percentage of cars compare to trucks (%)',80,True)
@@ -145,7 +147,7 @@ class HighwaySimulatorGui(QMainWindow):
             simu = 0
             self.options['prate'] = pRate
             while simu<self.sameSimuTimes:
-                waf = WafThread(self.options, self.pathOption.getValue())
+                waf = WafThread(self.options, self.pathOption.getValue(), scenario=self.scenarioOption.getName())
                 waf.simuDone.connect(self.wafDone)
                 self.simulations.append(waf)
                 QThreadPool.globalInstance().start(waf)
@@ -206,6 +208,7 @@ class HighwaySimulatorGui(QMainWindow):
             if setting != 'prate':
                 self.options[setting].save()
         self.pathOption.save()
+        self.scenarioOption.save()
         QSettings().setValue('actionWhenDone',self.actionWhenDone.currentIndex())
         QSettings().setValue('sameSimuTimes',self.sameSimuTimesOption.getValue())
         QSettings().setValue('gapPrate',self.gapPrateOption.getValue())
