@@ -134,7 +134,7 @@ class WafThread(QRunnable, QObject):
                     currentVelSum   = 0
                     for line in ambuResult:
                         r =line.replace('\n','').split(' ')
-                        currentTime = float(r[0])-1000.0
+                        currentTime = float(r[0])
                         currentPos  = float(r[1])
                         if previousPos>-1:
                             # calculate velocity
@@ -161,6 +161,9 @@ class WafThread(QRunnable, QObject):
                         previousTime = currentTime
                         previousPos  = currentPos
                     ambuResult.close()
+                    # Pop the first data of the acceleration
+                    currentAccData['time'].pop(0)
+                    currentAccData['acc'].pop(0)
                     # Gnuplot
                     g = Gnuplot.Gnuplot()
                     x = currentData['time']
