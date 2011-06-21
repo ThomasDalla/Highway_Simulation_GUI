@@ -147,7 +147,8 @@ class HighwaySimulatorGui(QMainWindow):
             simu = 0
             self.options['prate'] = pRate
             while simu<self.sameSimuTimes:
-                waf = WafThread(self.options, self.pathOption.getValue(), scenario=self.scenarioOption.getName())
+                waf = WafThread(self.options, self.pathOption.getValue(), self.scenarioOption.getName())
+                waf.setAutoDelete(True)
                 waf.simuDone.connect(self.wafDone)
                 self.simulations.append(waf)
                 QThreadPool.globalInstance().start(waf)
@@ -186,6 +187,8 @@ class HighwaySimulatorGui(QMainWindow):
 #                summary.close()
         self.progressBar.setValue(self.simulationsDone)
         if self.simulationsDone==self.simulationsTotal:
+            QThreadPool.globalInstance().waitForDone()
+            del self.simulations[:]
             self.releaseUi()
             if self.actionWhenDone.currentIndex()==1:
                 self.saveSettings()

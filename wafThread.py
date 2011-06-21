@@ -84,13 +84,13 @@ class WafThread(QRunnable, QObject):
 #        command = Ns2Command(self.options, out, scenario=self.scenario)
 #        returnCode = command.run()
         self.startTime = datetime.now()
-        print 'launching process...'
+        #print 'launching process...'
         process = subprocess.Popen(['./waf', '--run', self.scenario+self.options], stdout=out, cwd='/home/thomas/soft/ns-3.9')
-        print 'launched!'
+        #print 'launched!'
         process.communicate()
-        print 'process done'
+        #print 'process done'
         returnCode = process.returncode
-        print 'return code: %d' % returnCode
+        #print 'return code: %d' % returnCode
 
         out.close()
         out = open(self.outputFile, 'r')
