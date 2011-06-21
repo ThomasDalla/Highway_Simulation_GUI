@@ -194,6 +194,9 @@ class HighwaySimulatorGui(QMainWindow):
             self.releaseUi()
             if self.actionWhenDone.currentIndex()==1:
                 self.saveSettings()
+                from time import sleep
+                print 'shutdown in 20 seconds...'
+                sleep(20)
                 os.system('sudo halt')
             elif self.actionWhenDone.currentIndex()==2:
                 self.startSimu()
