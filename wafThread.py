@@ -88,8 +88,8 @@ class WafThread(QRunnable, QObject):
         process = subprocess.Popen(['./waf', '--run', self.scenario+self.options], stdout=out, cwd='/home/thomas/soft/ns-3.9')
         print 'launched!'
         process.communicate()
-        print 'communicate done'
-        returnCode = process.wait()
+        print 'process done'
+        returnCode = process.returncode
         print 'return code: %d' % returnCode
 
         out.close()
