@@ -118,11 +118,13 @@ class HighwaySimulatorGui(QMainWindow):
         self.logText.append(toLog)
     def blockUi(self):
         self.startButton.setEnabled(False)
+        self.scenarioOption.setEnabled(False)
         for option in self.options:
             if option!='prate':
                 self.options[option].setEnabled(False)
     def releaseUi(self):
         self.startButton.setEnabled(True)
+        self.scenarioOption.setEnabled(True)
         self.startButton.setText('START')
         for option in self.options:
             if option!='prate':
