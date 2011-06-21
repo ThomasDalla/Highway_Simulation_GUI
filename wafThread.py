@@ -17,32 +17,32 @@ def dateToFilename(d=-1,rn=-1,prate=-1):
     return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%.7d'%rn+prateStr
     #return '-'.join([str(d.year),'%2.2d'%d.month,'%2.2d'%d.day])+'_'+'-'.join(['%2.2d'%d.hour,'%2.2d'%d.minute,'%2.2d'%d.second])+'_'+'%d'%d.microsecond
 
-class Ns2Command(object):
-    def __init__(self, options, stdout, scenario='vanet-highway-test-thomas', command='./waf',cwd='/home/thomas/soft/ns-3.9'):
-        super(Ns2Command,self).__init__()
-        self.options    = options
-        self.scenario   = scenario
-        self.command    = command
-        self.cwd        = cwd
-        self.stdout     = stdout
-        self.process    = None
-    def run(self, timeout=1500):
-        def target():
-            #print 'Thread started'
-            #self.process = subprocess.Popen(self.cmd, shell=True)
-            self.process = subprocess.Popen([self.command, '--run', self.scenario+self.options], stdout=self.stdout, cwd='/home/thomas/soft/ns-3.9')
-            self.process.communicate()
-            #print 'Thread finished'
-
-        thread = threading.Thread(target=target)
-        thread.start()
-
-        thread.join(timeout)
-        if thread.is_alive():
-            #print 'Terminating process'
-            self.process.terminate()
-            thread.join()
-        return self.process.returncode
+#class Ns2Command(object):
+#    def __init__(self, options, stdout, scenario='vanet-highway-test-thomas', command='./waf',cwd='/home/thomas/soft/ns-3.9'):
+#        super(Ns2Command,self).__init__()
+#        self.options    = options
+#        self.scenario   = scenario
+#        self.command    = command
+#        self.cwd        = cwd
+#        self.stdout     = stdout
+#        self.process    = None
+#    def run(self, timeout=1500):
+#        def target():
+#            #print 'Thread started'
+#            #self.process = subprocess.Popen(self.cmd, shell=True)
+#            self.process = subprocess.Popen([self.command, '--run', self.scenario+self.options], stdout=self.stdout, cwd='/home/thomas/soft/ns-3.9')
+#            self.process.communicate()
+#            #print 'Thread finished'
+#
+#        thread = threading.Thread(target=target)
+#        thread.start()
+#
+#        thread.join(timeout)
+#        if thread.is_alive():
+#            #print 'Terminating process'
+#            self.process.terminate()
+#            thread.join()
+#        return self.process.returncode
 
 class WafThread(QRunnable, QObject):
     simuDone = Signal(str)
@@ -80,9 +80,18 @@ class WafThread(QRunnable, QObject):
         basename, ext = os.path.splitext(self.outputFile)
         self.options += ' --ambu=1 --af=%s' % self.outputAmbu
         out = open(self.outputFile, 'w')
-        command = Ns2Command(self.options, out, scenario=self.scenario)
+
+#        command = Ns2Command(self.options, out, scenario=self.scenario)
+#        returnCode = command.run()
         self.startTime = datetime.now()
-        returnCode = command.run()
+        print 'launching process...'
+        process = subprocess.Popen(['./waf', '--run', self.scenario+self.options], stdout=out, cwd='/home/thomas/soft/ns-3.9')
+        print 'launched!'
+        process.communicate()
+        print 'communicate done'
+        returnCode = process.wait()
+        print 'return code: %d' % returnCode
+
         out.close()
         out = open(self.outputFile, 'r')
         result = out.read()
