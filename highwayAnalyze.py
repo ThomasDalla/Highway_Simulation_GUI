@@ -237,7 +237,7 @@ class LoadResults(QThread):
                 tar.extractall(tempdir)
                 tar.close()
             for path, subdirs, files in os.walk(self.resultsPath):
-                for name in filter(lambda x: x.endswith('.txt'), files):
+                for name in filter(lambda x: x.endswith('.txt') and not x.endswith('_ambu.txt'), files):
                 #for name in files:
                     filePath = os.path.join(path,name)
                     with open(filePath) as result:
