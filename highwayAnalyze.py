@@ -158,7 +158,7 @@ class HighwayAnalyzeWidget(QWidget):
     def checkDate(self, r):
         return (not self.filterDate.isChecked()) or (r['date'] >= datetime(int(self.filterDateYear.currentText()), int(self.filterDateMonth.currentText()), int(self.filterDateDay.currentText())))
     def checkScenario(self, r):
-        return (not self.filterScenar.checkBox.isChecked()) or float(r['settings']['scenario'])==float(self.filterScenar.getValue())
+        return (not self.filterScenar.checkBox.isChecked()) or float(r['scenario'])==float(self.filterScenar.getValue())
     def checkGap(self, r):
         return (not self.filterGap.checkBox.isChecked()) or float(r['settings']['avgdist'])==float(self.filterGap.getValue())
     def analyzeResults(self):
