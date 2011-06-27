@@ -72,7 +72,7 @@ class WafThread(QRunnable, QObject):
                 settings[option] = options[option]
             else:
                 settings[option] = options[option].getValue()
-        self.output = {'settings':settings,'command':'%s %s%s' % (self.command, ' --run \'', self.scenario+self.options+'\'')}
+        self.output = {'scenario':scenario, 'settings':settings,'command':'%s %s%s' % (self.command, ' --run \'', self.scenario+self.options+'\'')}
     def run(self, *args, **kwargs):
         outputBase = os.path.join(self.outputFolder,dateToFilename(datetime.now(), self.runNumber, prate=self.prate))
         self.outputFile = outputBase+'.txt'

@@ -33,6 +33,7 @@ class HighwaySimulatorGui(QMainWindow):
         self.pathOption = SimpleOption('path','Output Path','/home/thomas/Dropbox/Keio/research/results/')
         generalGroup.layout().addWidget(self.pathOption)
         self.scenarioOption = SimpleComboboxOption('scenario','Scenario',1, False, 'vanet-highway-test-thomas','vanet-highway-scenario2')
+        self.scenarioOption.combo.currentIndexChanged[int].connect(self.scenarioChanged)
         generalGroup.layout().addWidget(self.scenarioOption)
         self.options['time'] = SimpleSpinOption('time','Simulation Time (sec.)',1500,True)
         self.options['time'].setRange(0,3000)
@@ -63,8 +64,21 @@ class HighwaySimulatorGui(QMainWindow):
         self.options['std1'].setRange(0.1,50.0)
         self.options['maxflow'] = SimpleSpinOption('maxflow','Traffic Maximum Flow (veh/s)',5)
         self.options['maxflow'].setRange(0.1,50.0)
-        for widget in ('vel1','dis','spstd','flow1','std1','maxflow'):
+        # Scenar 2
+        self.options['avgdist'] = SimpleSpinOption('avgdist','Average Distance (m)',100)
+        self.options['avgdist'].setRange(1,10000)
+        self.options['avgspeed'] = SimpleSpinOption('avgspeed','Average Speed (km/h)',105)
+        self.options['avgspeed'].setRange(1,10000)
+        self.options['despeed'] = SimpleSpinOption('despeed','Desired Speed (km/h)',130)
+        self.options['despeed'].setRange(1,10000)
+        self.options['ambumaxspeed'] = SimpleSpinOption('ambumaxspeed','Ambu Max Speed (km/h)',165)
+        self.options['ambumaxspeed'].setRange(1,10000)
+        self.options['ambuinitspeed'] = SimpleSpinOption('ambuinitspeed','Ambu Initial Speed (km/h)',130)
+        self.options['ambuinitspeed'].setRange(1,10000)
+        for widget in ('vel1','dis','spstd','flow1','std1','maxflow',
+                       'avgdist', 'avgspeed', 'despeed', 'ambumaxspeed', 'ambuinitspeed'):
             trafficGroup.layout().addWidget(self.options[widget])
+        self.scenarioChanged(self.scenarioOption.combo.currentIndex())
         gridLayout.addWidget(trafficGroup,0,1)
         # VANET
         vanetGroup = QGroupBox('VANET Settings')
@@ -111,6 +125,21 @@ class HighwaySimulatorGui(QMainWindow):
         #self.resultFile = open('/home/thomas/Dropbox/Keio/research/results/summary.txt', 'a')
         #self.resultFile = os.path.join(self.pathOption.getValue(), 'summary.txt')
         self.logFile = os.path.join(self.pathOption.getValue(), 'results_'+os.uname()[1]+'.log')
+    @Slot(int)
+    def scenarioChanged(self, index):
+        #print index
+        scenar1options = ['gap', 'vel1', 'dis', 'flow1', 'std1','spstd', 'maxflow']
+        scenar2options = ['avgdist', 'avgspeed', 'despeed', 'ambumaxspeed', 'ambuinitspeed']
+        if index==0: # first scenario
+            scenar1 = True
+            scenar2 = False
+        else:
+            scenar1 = False
+            scenar2 = True
+        for option in scenar1options:
+            self.options[option].setVisible(scenar1)
+        for option in scenar2options:
+            self.options[option].setVisible(scenar2)
     def log(self, txt):
         toLog = '%s | %s' % (datetime.now(), txt)
         with open(self.logFile, 'a') as logFile:
