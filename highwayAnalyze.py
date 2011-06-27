@@ -105,6 +105,12 @@ class HighwayAnalyzeWidget(QWidget):
         filterGroupLayout.addWidget(dateWidget)
         filterGroup.setLayout(filterGroupLayout)
         self.topLeftLayout.addWidget(filterGroup)
+        # Filter the scenario
+        self.filterScenar = SimpleComboboxOption('scenar','Scenario',1, True, 'vanet-highway-test-thomas','vanet-highway-scenario2')
+        filterGroupLayout.addWidget(self.filterScenar)
+        # Filter gap
+        self.filterGap = SimpleSpinOption('avgdistanalyze','Average Distance (m)',100, checkable=True)
+        filterGroupLayout.addWidget(self.filterGap)
     def loadResults(self):
         self.loadResultsButton.setText('Loading the results...')
         self.loadResultsButton.setEnabled(False)
@@ -151,6 +157,10 @@ class HighwayAnalyzeWidget(QWidget):
         return (not self.filterDistribution.checkBox.isChecked()) or r['settings']['dis']==self.filterDistribution.getValue()
     def checkDate(self, r):
         return (not self.filterDate.isChecked()) or (r['date'] >= datetime(int(self.filterDateYear.currentText()), int(self.filterDateMonth.currentText()), int(self.filterDateDay.currentText())))
+    def checkScenario(self, r):
+        return (not self.filterScenar.isChecked()) or r['settings']['scenario']==self.filterScenar.getValue()
+    def checkGap(self, r):
+        return (not self.filterGap.isChecked()) or r['settings']['avgdist']==self.filterGap.getValue()
     def analyzeResults(self):
         self.saveSettings()
         if len(self.results)<=0:
@@ -207,6 +217,8 @@ class HighwayAnalyzeWidget(QWidget):
         self.logText.append(toLog)
     def saveSettings(self):
         QSettings().setValue('simuNbMin', self.filterNb.getValue())
+        QSettings().setValue('avgdistanalyze', self.filterGap.getValue())
+        QSettings().setValue('scenar', self.filterScenar.getValue())
         QSettings().setValue('dis', self.filterDistribution.getValue())
         QSettings().setValue('dateDay', self.filterDateDay.currentIndex())
         QSettings().setValue('dateMonth', self.filterDateMonth.currentIndex())
@@ -251,6 +263,13 @@ class LoadResults(QThread):
                             if 'results' in r and 'timeToReachDest' in r['results'] and 'succeed' in r and r['succeed'] == 1:
                                 r['filename'] = name
                                 r['date'] = datetime.fromtimestamp(os.path.getmtime(filePath))
+                                if 'avgdist' not in r['settings']:
+                                    r['settings']['avgdist'] = 100;
+                                if 'scenario' not in r:
+                                    if r['date'] >= datetime(2010, 6, 17):
+                                        r['scenario'] = 'vanet-highway-scenario2'
+                                    else:
+                                        r['scenario'] = 'vanet-highway-test-thomas'
                                 results.append(r)
                             else:
                                 self.simulationFailed += 1
