@@ -184,12 +184,19 @@ class WafThread(QRunnable, QObject):
                         gapStr = '_g%.4d' % jsonR['averageGapOnLane0_New']
                     basename += minGapStr+gapStr+maxGapStr
                     try:
-                        t = '[prate:%d][dis:%d][gap:%2.2f][flow:%2.2f][maxFlow:%2.2f]'\
-                        % (self.prate,
-                           self.optionsDict['dis'].getValue(),
-                           self.optionsDict['gap'].getValue(),
-                           self.optionsDict['flow1'].getValue(),
-                           self.optionsDict['maxflow'].getValue())
+                        if self.scenario=='vanet-highway-test-thomas':
+                            t = '[prate:%d][dis:%d][gap:%2.2f][flow:%2.2f][maxFlow:%2.2f]'\
+                            % (self.prate,
+                               self.optionsDict['dis'].getValue(),
+                               self.optionsDict['gap'].getValue(),
+                               self.optionsDict['flow1'].getValue(),
+                               self.optionsDict['maxflow'].getValue())
+                        else:
+                            t = '[prate:%d][avgDist:%d][avgSpeed:%d][ambumax:%d]'\
+                            % (self.prate,
+                               self.optionsDict['avgdist'].getValue(),
+                               self.optionsDict['avgspeed'].getValue(),
+                               self.optionsDict['ambumaxspeed'].getValue())
                     except:
                         t = basename
                     g.title(t)
