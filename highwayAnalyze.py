@@ -74,6 +74,7 @@ class HighwayAnalyzeWidget(QWidget):
         # Distribution Model
         self.filterDistribution = SimpleComboboxOption('dis','Speed Distribution Model',3, True, 'Uniform','Exponential','Normal','Log Normal')
         filterGroupLayout.addWidget(self.filterDistribution)
+        self.filterDistribution.setVisible(False)
         # Number of results per point
         self.filterNb = SimpleSpinOption('simuNbMin', 'Minimum results for a given setting', 10, integer=True, checkable=True)
         self.filterNb.checkBox.setChecked(True)
@@ -262,11 +263,12 @@ class LoadResults(QThread):
                             #print r['date']
                             if 'results' in r and 'timeToReachDest' in r['results'] and 'succeed' in r and r['succeed'] == 1:
                                 r['filename'] = name
-                                r['date'] = datetime.fromtimestamp(os.path.getmtime(filePath))
+                                fileDate = datetime.fromtimestamp(os.path.getmtime(filePath))
+                                r['date'] = fileDate
                                 if 'avgdist' not in r['settings']:
                                     r['settings']['avgdist'] = 100;
                                 if 'scenario' not in r:
-                                    if r['date'] >= datetime(2010, 6, 17):
+                                    if fileDate >= datetime(2011, 6, 17):
                                         r['scenario'] = 'vanet-highway-scenario2'
                                     else:
                                         r['scenario'] = 'vanet-highway-test-thomas'
