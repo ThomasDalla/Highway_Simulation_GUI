@@ -272,8 +272,8 @@ class LoadResults(QThread):
                                         r['scenario'] = 'vanet-highway-scenario2'
                                     else:
                                         r['scenario'] = 'vanet-highway-test-thomas'
-                                    print fileDate
-                                    print '--> %s' % r['scenario']
+#                                    print fileDate
+#                                    print '--> %s' % r['scenario']
                                 results.append(r)
                             else:
                                 self.simulationFailed += 1
