@@ -152,15 +152,15 @@ class HighwayAnalyzeWidget(QWidget):
             self.averageSimulationTime= totalTime/nb
             self.loadResultsLabel.setText(self.loadResultsLabel.text()+'\nAverage simulation time: %3.0f'%self.averageSimulationTime)
     def fil(self, r):
-        return self.checkDis(r) and self.checkDate(r)
+        return self.checkDis(r) and self.checkDate(r) and self.checkGap(r) and self.checkScenario(r)
     def checkDis(self,r):
         return (not self.filterDistribution.checkBox.isChecked()) or r['settings']['dis']==self.filterDistribution.getValue()
     def checkDate(self, r):
         return (not self.filterDate.isChecked()) or (r['date'] >= datetime(int(self.filterDateYear.currentText()), int(self.filterDateMonth.currentText()), int(self.filterDateDay.currentText())))
     def checkScenario(self, r):
-        return (not self.filterScenar.isChecked()) or r['settings']['scenario']==self.filterScenar.getValue()
+        return (not self.filterScenar.isChecked()) or float(r['settings']['scenario'])==float(self.filterScenar.getValue())
     def checkGap(self, r):
-        return (not self.filterGap.isChecked()) or r['settings']['avgdist']==self.filterGap.getValue()
+        return (not self.filterGap.isChecked()) or float(r['settings']['avgdist'])==float(self.filterGap.getValue())
     def analyzeResults(self):
         self.saveSettings()
         if len(self.results)<=0:
