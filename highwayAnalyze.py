@@ -266,7 +266,7 @@ class LoadResults(QThread):
                                 fileDate = datetime.fromtimestamp(os.path.getmtime(filePath))
                                 r['date'] = fileDate
                                 if 'avgdist' not in r['settings']:
-                                    r['settings']['avgdist'] = 100;
+                                    r['settings']['avgdist'] = 100
                                 if 'scenario' not in r:
                                     if fileDate >= datetime(2011, 6, 17):
                                         r['scenario'] = 'vanet-highway-scenario2'
