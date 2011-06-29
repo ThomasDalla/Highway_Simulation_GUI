@@ -168,87 +168,87 @@ class AlgorithmValidationWidget(QWidget):
         #self.paintEvent('car')
         self.paintEvent('')
         # DEFAULT MESSAGE
-        self.naviMessage = 'DISPLAY INFORMATION ONLY (1)'
+        naviMessage = 'DISPLAY INFORMATION ONLY (1)'
 
         if carSegment==ambuSegment and (carSegmentDiff==ambuSegmentDiff or carSegment=='Q' or carSegment=='R' or carSegment=='S' or carSegment=='T'):
             QMessageBox.critical(self, 'Error', 'The car and the ambulance are at the same position.\nUse DIFF to put them on the same segment, different position.')
             return
         painter = QPainter(self)
         painter.setPen(Qt.black)
-        self.carX = 0
-        self.carY = 0
+        carX = 0
+        carY = 0
 
         # POSITION OF THE POINTS
-        self.xPos = {'A':125,'B':140,'C':155,'D':170,
+        xPos = {'A':125,'B':140,'C':155,'D':170,
                      'E':125,'F':140,'G':155,'H':170,
                      'I':60,'J':60,'K':60,'L':60,
                      'M':240,'N':240,'O':240,'P':240,
                      'Q':132,'R':162,'S':132,'T':162}
-        self.yPos = {'A':60,'B':60,'C':60,'D':60,
+        yPos = {'A':60,'B':60,'C':60,'D':60,
                      'E':240,'F':240,'G':240,'H':240,
                      'I':125,'J':140,'K':155,'L':165,
                      'M':125,'N':140,'O':155,'P':165,
                      'Q':130,'R':130,'S':160,'T':160}
 
         # CALCULATE THE CAR POSITION
-        self.carX = self.xPos[carSegment]
-        self.carY = self.yPos[carSegment]
+        carX = xPos[carSegment]
+        carY = yPos[carSegment]
         if carSegment=='A' or carSegment=='B' or carSegment=='C' or carSegment=='D'\
             or carSegment=='E' or carSegment=='F' or carSegment=='G' or carSegment=='H':
-            self.carY += float(carSegmentDiff)*20
+            carY += float(carSegmentDiff)*20
         elif carSegment!='Q' and carSegment!='R' and carSegment!='S' and carSegment!='T':
-            self.carX += float(carSegmentDiff)*20
+            carX += float(carSegmentDiff)*20
 
         # CALCULATE THE AMBULANCE POSITION
-        self.ambuX = self.xPos[ambuSegment]
-        self.ambuY = self.yPos[ambuSegment]
+        ambuX = xPos[ambuSegment]
+        ambuY = yPos[ambuSegment]
         if ambuSegment=='A' or ambuSegment=='B' or ambuSegment=='C' or ambuSegment=='D'\
             or ambuSegment=='E' or ambuSegment=='F' or ambuSegment=='G' or ambuSegment=='H':
-            self.ambuY += float(ambuSegmentDiff)*20
+            ambuY += float(ambuSegmentDiff)*20
         elif ambuSegment!='Q' and ambuSegment!='R' and ambuSegment!='S' and ambuSegment!='T':
-            self.ambuX += float(ambuSegmentDiff)*20
+            ambuX += float(ambuSegmentDiff)*20
 
         # POSSIBLE DIRECTIONS
-        self.direction = dict()
-        self.direction['W'] = [ ['A', 'Q', 'I'], ['B','Q','J'],
+        direction = dict()
+        direction['W'] = [ ['A', 'Q', 'I'], ['B','Q','J'],
                                 ['M', 'R', 'Q', 'I'], ['N','R','Q','J'],
                                 ['G', 'T', 'R', 'Q', 'J'], ['H', 'T', 'R', 'Q', 'I'],
                                 ['I'], ['J'],
                                 ['Q', 'I'], ['R', 'Q', 'I'], ['T', 'R', 'Q', 'I']]
-        self.direction['E'] = [ ['B', 'Q', 'S', 'T', 'O'], ['A', 'Q', 'S', 'T', 'P'],
+        direction['E'] = [ ['B', 'Q', 'S', 'T', 'O'], ['A', 'Q', 'S', 'T', 'P'],
                                 ['K', 'S', 'T', 'O'], ['L', 'S', 'T', 'P'],
                                 ['G', 'T', 'O'], ['H', 'T', 'P'],
                                 ['T', 'P'], ['S', 'T', 'P'],['Q', 'S', 'T', 'P'],
                                 ['E'], ['F']]
-        self.direction['N'] = [ ['G', 'T','R', 'C'], ['H', 'T', 'R', 'D'],
+        direction['N'] = [ ['G', 'T','R', 'C'], ['H', 'T', 'R', 'D'],
                                 ['M', 'R', 'D'], ['N', 'R', 'C'],
                                 ['K', 'S', 'T', 'R', 'C'], ['L', 'S', 'T', 'R', 'D'],
                                 ['S', 'T', 'R', 'D'], ['T', 'R', 'D'], ['R', 'D'],
                                 ['C'], ['D']]
-        self.direction['S'] = [ ['A', 'Q', 'S', 'E'], ['B', 'Q', 'S', 'F'],
+        direction['S'] = [ ['A', 'Q', 'S', 'E'], ['B', 'Q', 'S', 'F'],
                                 ['K', 'S', 'F'], ['L', 'S', 'E'],
                                 ['M', 'R', 'Q', 'S', 'E'], ['N', 'R', 'Q', 'S', 'F'],
                                 ['R', 'Q', 'S', 'E'],['Q', 'S', 'E'],['S', 'E'],
                                 ['E'], ['F']]
 
         # COPY OF THE POSSIBLE DIRECTIONS (otherwise car/ambu share the same pointer :s)
-        self.direction2 = dict()
-        self.direction2['W'] = [ ['A', 'Q', 'I'], ['B','Q','J'],
+        direction2 = dict()
+        direction2['W'] = [ ['A', 'Q', 'I'], ['B','Q','J'],
                                 ['M', 'R', 'Q', 'I'], ['N','R','Q','J'],
                                 ['G', 'T', 'R', 'Q', 'J'], ['H', 'T', 'R', 'Q', 'I'],
                                 ['I'], ['J'],
                                 ['Q', 'I'], ['R', 'Q', 'I'], ['T', 'R', 'Q', 'I']]
-        self.direction2['E'] = [ ['B', 'Q', 'S', 'T', 'O'], ['A', 'Q', 'S', 'T', 'P'],
+        direction2['E'] = [ ['B', 'Q', 'S', 'T', 'O'], ['A', 'Q', 'S', 'T', 'P'],
                                 ['K', 'S', 'T', 'O'], ['L', 'S', 'T', 'P'],
                                 ['G', 'T', 'O'], ['H', 'T', 'P'],
                                 ['T', 'P'], ['S', 'T', 'P'],['Q', 'S', 'T', 'P'],
                                 ['E'], ['F']]
-        self.direction2['N'] = [ ['G', 'T','R', 'C'], ['H', 'T', 'R', 'D'],
+        direction2['N'] = [ ['G', 'T','R', 'C'], ['H', 'T', 'R', 'D'],
                                 ['M', 'R', 'D'], ['N', 'R', 'C'],
                                 ['K', 'S', 'T', 'R', 'C'], ['L', 'S', 'T', 'R', 'D'],
                                 ['S', 'T', 'R', 'D'], ['T', 'R', 'D'], ['R', 'D'],
                                 ['C'], ['D']]
-        self.direction2['S'] = [ ['A', 'Q', 'S', 'E'], ['B', 'Q', 'S', 'F'],
+        direction2['S'] = [ ['A', 'Q', 'S', 'E'], ['B', 'Q', 'S', 'F'],
                                 ['K', 'S', 'F'], ['L', 'S', 'E'],
                                 ['M', 'R', 'Q', 'S', 'E'], ['N', 'R', 'Q', 'S', 'F'],
                                 ['R', 'Q', 'S', 'E'],['Q', 'S', 'E'],['S', 'E'],
@@ -256,50 +256,50 @@ class AlgorithmValidationWidget(QWidget):
 
 
         # Calculate the path to destination for the ambulance
-        self.ambuPathSeg = None
+        ambuPathSeg = None
         painter.setPen(Qt.white)
-        for path in self.direction2[ambuDest]:
+        for path in direction2[ambuDest]:
             if path[0]==ambuSegment:
-                self.ambuPathSeg = path
-        if self.ambuPathSeg is None:
+                ambuPathSeg = path
+        if ambuPathSeg is None:
             QMessageBox.critical(self, 'Error', 'The ambu cannot go there!')
             return
         else:
-            #print self.ambuPathSeg
-            if len(self.ambuPathSeg)>1:
-                del self.ambuPathSeg[0]
-            self.ambuPath = []
-            previous_point = QPoint(self.ambuX, self.ambuY)
-            for seg in self.ambuPathSeg:
+            #print ambuPathSeg
+            if len(ambuPathSeg)>1:
+                del ambuPathSeg[0]
+            ambuPath = []
+            previous_point = QPoint(ambuX, ambuY)
+            for seg in ambuPathSeg:
                 new_point = QPoint(self.xSeg[seg],self.ySeg[seg])
-                self.ambuPath.append([previous_point, new_point])
+                ambuPath.append([previous_point, new_point])
                 previous_point = new_point
-            #print self.ambuPath
-            for line in self.ambuPath:
+            #print ambuPath
+            for line in ambuPath:
                 #print line
                 painter.drawLine(*line)
 
         # Calculate the path to destination for the car
-        self.carPathSeg = None
+        carPathSeg = None
         painter.setPen(dashPenRed)
-        for path in self.direction[carDest]:
+        for path in direction[carDest]:
             if path[0]==carSegment:
-                self.carPathSeg = path
-        if self.carPathSeg is None:
+                carPathSeg = path
+        if carPathSeg is None:
             QMessageBox.critical(self, 'Error', 'The car cannot go there!')
             return
         else:
-            #print self.carPathSeg
-            if len(self.carPathSeg)>1:
-                del self.carPathSeg[0]
-            self.carPath = []
-            previous_point = QPoint(self.carX, self.carY)
-            for seg in self.carPathSeg:
+            #print carPathSeg
+            if len(carPathSeg)>1:
+                del carPathSeg[0]
+            carPath = []
+            previous_point = QPoint(carX, carY)
+            for seg in carPathSeg:
                 new_point = QPoint(self.xSeg[seg],self.ySeg[seg])
-                self.carPath.append([previous_point, new_point])
+                carPath.append([previous_point, new_point])
                 previous_point = new_point
-            #print self.carPath
-            for line in self.carPath:
+            #print carPath
+            for line in carPath:
                 #print line
                 painter.drawLine(*line)
 
@@ -308,12 +308,12 @@ class AlgorithmValidationWidget(QWidget):
         # =========================
 
         # distance of the first line of the car and the ambu
-        carFirstLineDist = dist(*self.carPath[0])
-        ambuFirstLineDist = dist(*self.ambuPath[0])
+        carFirstLineDist = dist(*carPath[0])
+        ambuFirstLineDist = dist(*ambuPath[0])
 
-        # If the car is in its last segment
-        # or at the intersection
-        if len(self.carPathSeg)==1 or atIntersection(carSegment):
+        # If the car has already passed the intersection
+        # or is at the intersection
+        if len(carPathSeg)==1 or atIntersection(carSegment):
             # and the ambulance also
             if sameWay(carSegment, ambuSegment):
                 # and even at the same segment
@@ -322,21 +322,21 @@ class AlgorithmValidationWidget(QWidget):
                     if carFirstLineDist < ambuFirstLineDist:
                         # and can change lane, we ask to change lane
                         if multipleLanes:
-                            self.naviMessage = 'Please change lane, the ambulance is behind you'
+                            naviMessage = 'Please change lane, the ambulance is behind you'
                         # else if we have the same destination, change the car destination
                         elif carDest==ambuDest:
-                            self.naviMessage = 'Please change your way to %s' % redirect(carSegment,carDest)
+                            naviMessage = 'Please change your way to %s' % redirect(carSegment,carDest)
                         else: # else there is nothing we can do except continuing
-                            self.naviMessage = 'Ambulance is behind you. Stick to your plan.'
+                            naviMessage = 'Ambulance is behind you. Stick to your plan.'
                 # else, we are in the same way, but not the same segment
                 elif carFirstLineDist < ambuFirstLineDist:
                     # if we are ahead, give priority to the ambulance
-                    self.naviMessage = 'Stay in this lane and slow down to let the ambulance go first.'
+                    naviMessage = 'Stay in this lane and slow down to let the ambulance go first.'
                 # else, we should see it, no need to worry the driver more
             # else, we are not in the same way
-            elif ambuDest==carDest and len(self.carPathSeg) < len(self.ambuPathSeg):
+            elif ambuDest==carDest and len(carPathSeg) < len(ambuPathSeg):
                 # if the car is coming this way, let the driver know it
-                self.naviMessage = 'Ambulance will come this way.'
+                naviMessage = 'Ambulance will come this way.'
             # else, there is nothing special to do (we are at the end segment and the ambu is not coming)
 
         # Else, if we are in the same way (but not the last one)
@@ -347,38 +347,35 @@ class AlgorithmValidationWidget(QWidget):
                 if carFirstLineDist < ambuFirstLineDist:
                     # and can change lane, advise the driver to do so
                     if multipleLanes:
-                        self.naviMessage = 'Please change lane, slow down, and let the ambulance go first.'
+                        naviMessage = 'Please change lane, slow down, and let the ambulance go first.'
                     # else, if we have the same destination, change our way to the destination
                     elif carDest==ambuDest:
-                        self.naviMessage = 'Please change your way to %s' % redirect(carSegment,carDest)
+                        naviMessage = 'Please change your way to %s' % redirect(carSegment,carDest)
                     else: # else there is nothing we can do except continuing
-                        self.naviMessage = 'Ambulance is behind you. Stick to your plan.'
+                        naviMessage = 'Ambulance is behind you. Stick to your plan.'
             # else, we are in the same way but not the same segment
             elif carFirstLineDist < ambuFirstLineDist:
                 # if we are ahead, let the driver know to stay in this lane but to slow down
-                self.naviMessage = 'Stay in this lane and slow down to let the ambulance go first.'
+                naviMessage = 'Stay in this lane and slow down to let the ambulance go first.'
             # else there is nothing special to do (same way, different segment, behind the ambu)
 
         # Else, if the ambu is at its last segment or at the intersection before its last segment
         # there is nothing special
-        elif len(self.ambuPathSeg)==1 or atIntersection(ambuSegment):
-            self.naviMessage = 'DISPLAY INFORMATION ONLY (2)'
+        elif len(ambuPathSeg)==1 or atIntersection(ambuSegment):
+            naviMessage = 'DISPLAY INFORMATION ONLY (2)'
 
         # else, we are in different ways and both going to cross the intersection
         # check if our routes intersect
-        elif routesIntersect(self.ambuPathSeg, self.carPathSeg):
-            self.naviMessage = 'STOP at the next intersection and let the ambulance go first.'
+        elif routesIntersect(ambuPathSeg, carPathSeg):
+            naviMessage = 'STOP at the next intersection and let the ambulance go first.'
         # else, we are in different ways and are not going to cross our routes, just display info
         else:
-            self.naviMessage = 'DISPLAY INFORMATION ONLY (3)'
+            naviMessage = 'DISPLAY INFORMATION ONLY (3)'
 
-        # Check if I'm on the same segment
-        #if carSegment==ambuSegment:
-            # Am I ahead or behind?
+        self.message.emit(naviMessage)
 
-        self.message.emit(self.naviMessage)
-        painter.fillRect(QRectF(self.carX, self.carY, 10,10), Qt.red)
-        painter.fillRect(QRectF(self.ambuX, self.ambuY, 10,10), Qt.white)
+        painter.fillRect(QRectF(carX, carY, 10,10), Qt.red)
+        painter.fillRect(QRectF(ambuX, ambuY, 10,10), Qt.white)
 
 class AlgorithmValidationWindow(QMainWindow):
     def __init__(self):
@@ -399,9 +396,10 @@ class AlgorithmValidationWindow(QMainWindow):
         self.image.setMinimumWidth(300)
         self.image.message.connect(self.updateNavi)
         leftWidget.layout().addWidget(self.image)
-        self.carNaviLabel = QLabel("CAR NAVI")
+        self.carNaviLabel = QLabel()
         self.carNaviLabel.setAlignment(Qt.AlignCenter)
         self.carNaviLabel.setFont(QFont("Century Gothic", 10))
+        self.carNaviLabel.setText("CAR NAVIGATION SYSTEM")
         leftWidget.layout().addWidget(self.carNaviLabel)
         centralLayout.addWidget(leftWidget)
 
